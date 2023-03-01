@@ -183,6 +183,7 @@ class FUNSD(data.Dataset):
                 entity_link_labels.append(1)
             else:
                 entity_link_labels.append(0)
+        # print(type(entity_link_labels))
         entity_link_labels=torch.tensor(entity_link_labels)
         
         target_am = np.zeros((len(node_position),len(node_position)))
