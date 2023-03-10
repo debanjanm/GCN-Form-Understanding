@@ -169,6 +169,10 @@ class FUNSD(data.Dataset):
         entity_graph_nx = nx.complete_graph(len(form_data))
         entity_graph = dgl.DGLGraph()
         entity_graph = dgl.from_networkx(entity_graph_nx)
+
+        edge_src, edge_dst = entity_graph.edges()
+        edge_jaccard = [[score] for _, _, score in nx.jaccard_coefficient(entity_graph_nx, zip(edge_src.tolist(), edge_dst.tolist()))]
+        edge_jaccard = torch.tensor(edge_jaccard)
         
         entity_graph = dgl.to_bidirected(entity_graph)
         entity_graph_edges = torch.t(torch.stack([entity_graph.edges()[0],entity_graph.edges()[1]]))
@@ -176,6 +180,8 @@ class FUNSD(data.Dataset):
         entity_graph.ndata['position']=entity_positions
         entity_graph.ndata['w_embed']=entity_embeddings
         entity_graph.ndata['shape']=entity_shapes
+        entity_graph.edata['jaccard']=edge_jaccard
+
 
         entity_link_labels = []
         for edge in entity_graph_edges.tolist():
