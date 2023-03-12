@@ -26,7 +26,6 @@ import dgl
 from torch.optim.lr_scheduler import StepLR
 from utils import *
 
-# from torch_geometric.nn import GATv2Conv
 
 class Net(nn.Module):
     def __init__(self, in_dim, hidden_dim,heads=8):
@@ -39,14 +38,9 @@ class Net(nn.Module):
         # self.conv2 = GATConv(4*hidden_dim, hidden_dim, 4, residual=True, activation=F.relu)
         # self.conv3 = GATConv(4*hidden_dim, hidden_dim, 4, residual=True)
 
-        # self.conv1 = GATv2Conv(in_dim, hidden_dim, 4, residual=True, activation=F.relu)
-        # self.conv2 = GATv2Conv(4*hidden_dim, hidden_dim, 4, residual=True, activation=F.relu)
-        # self.conv3 = GATv2Conv(4*hidden_dim, hidden_dim, 4, residual=True)
-
-        self.conv1 = EGATConv(in_node_feats=20,in_edge_feats=12,out_node_feats=15,out_edge_feats=10,num_heads=3)
-        self.conv2 = EGATConv(4*hidden_dim, hidden_dim, 4, residual=True, activation=F.relu)
-        self.conv3 = EGATConv(4*hidden_dim, hidden_dim, 4, residual=True)
-
+        self.conv1 = GATv2Conv(in_dim, hidden_dim, 4, residual=True, activation=F.relu)
+        self.conv2 = GATv2Conv(4*hidden_dim, hidden_dim, 4, residual=True, activation=F.relu)
+        self.conv3 = GATv2Conv(4*hidden_dim, hidden_dim, 4, residual=True)
 
         self.w_group_mlp = nn.Sequential(nn.Linear(hidden_dim, hidden_dim), nn.ReLU(True), nn.Linear(hidden_dim, 1), nn.Sigmoid())
         self.entity_linear = nn.Linear(hidden_dim,hidden_dim)
@@ -88,12 +82,8 @@ class Net(nn.Module):
         # For undirected graphs, in_degree is the same as
         # out_degree.
         #h = g.ndata['position']
-        # h = torch.cat([g.ndata['position'],g.ndata['shape'],g.ndata['w_embed']],dim=1)
-        
-        u_feat = torch.cat([g.ndata['position'],g.ndata['shape'],g.ndata['w_embed']],dim=1)
-        v_feat = torch.cat([g.edata['jaccard']],dim=1)
-        nfeats = (u_feat,v_feat)
-        
+        h = torch.cat([g.ndata['position'],g.ndata['shape'],g.ndata['w_embed']],dim=1)
+                
         if torch.cuda.is_available():
           h = h.cuda() 
         #h = F.relu(self.conv1(g, h))
